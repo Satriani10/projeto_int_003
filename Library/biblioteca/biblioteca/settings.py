@@ -28,9 +28,7 @@ DEBUG = True
 
 
 #tirar depois
-ALLOWED_HOSTS = ['*',
-                 "b243-200-148-4-32.ngrok-free.app"
-                 "1752-200-148-4-32.ngrok-free.app",]
+ALLOWED_HOSTS = ['*',]
 
 
 #tirar depois
