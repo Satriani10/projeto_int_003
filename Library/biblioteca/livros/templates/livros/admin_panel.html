@@ -7,7 +7,7 @@
 <a href="{% url 'backup' %}" class="btn btn-primary mb-3">Fazer Backup</a>
 
 <!-- Listagem de Backups Disponíveis -->
-<h3>Backups Disponíveis</h3>
+
 {% if backups %}
 <ul>
   {% for backup in backups %}
@@ -22,7 +22,7 @@
   {% endfor %}
 </ul>
 {% else %}
-<p>Nenhum backup disponível.</p>
+
 {% endif %}
 
 <!-- Formulário para Importar Backup -->
