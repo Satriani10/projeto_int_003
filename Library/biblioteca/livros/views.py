@@ -12,7 +12,7 @@ from django.core.files.base import ContentFile
 import logging
 
 
-# Função para verificar se o usuário é administrador (staff)
+# Função para verificar se o usuário é administrador 
 def is_admin(user):
     return user.is_staff
 
@@ -20,11 +20,14 @@ def index(request):
     query = request.GET.get('search', '')
     tag_filter = request.GET.get('tag', '')
     books = Book.objects.all()
+    
     if query:
         books = books.filter(title__icontains=query)
     if tag_filter:
         books = books.filter(tags__name=tag_filter)
+    
     tags = Tag.objects.all()
+    
     return render(request, 'livros/index.html', {
         'books': books,
         'tags': tags,
@@ -92,9 +95,10 @@ def edit_book(request, book_id):
 @login_required
 def borrow_book(request, book_id):
     book = get_object_or_404(Book, pk=book_id)
-    if not book.available:
+    if book.available_quantity <= 0:
         messages.error(request, 'Livro indisponível para empréstimo.')
         return redirect('index')
+    
     if request.method == 'POST':
         form = BorrowForm(request.POST)
         if form.is_valid():
@@ -102,12 +106,16 @@ def borrow_book(request, book_id):
             borrow.book = book
             borrow.user = request.user
             borrow.save()
-            book.available = False  # Marca o livro como indisponível
+            
+            # Atualiza a quantidade disponível
+            book.available_quantity -= 1
             book.save()
+            
             messages.success(request, 'Livro emprestado com sucesso!')
             return redirect('index')
     else:
         form = BorrowForm()
+    
     return render(request, 'livros/borrow.html', {'form': form, 'book': book})
 
 @login_required
@@ -120,12 +128,16 @@ def return_book(request, borrow_id):
             borrow = form.save(commit=False)
             borrow.return_date = timezone.now()
             borrow.save()
-            borrow.book.available = True  # Marca o livro como disponível novamente
+            
+            # Atualiza a quantidade disponível
+            borrow.book.available_quantity += 1
             borrow.book.save()
+            
             messages.success(request, 'Livro marcado como devolvido.')
             return redirect('admin_panel')
     else:
         form = ReturnForm(instance=borrow)
+    
     return render(request, 'livros/return_book.html', {'form': form, 'borrow': borrow})
 
 @login_required
@@ -173,11 +185,12 @@ def backup(request):
 @login_required
 def emprestimo_view(request):
     query = request.GET.get('q', '')
-    books = Book.objects.filter(available=True)
+    books = Book.objects.filter(available_quantity__gt=0)  # Filtra livros disponíveis
+    
     if query:
         books = books.filter(title__icontains=query)
+    
     return render(request, 'livros/emprestimo.html', {'books': books, 'query': query})
-
 
 logger = logging.getLogger(__name__)
 

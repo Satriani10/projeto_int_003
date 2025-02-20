@@ -2,25 +2,28 @@
 {% block title %}Biblioteca - Home{% endblock %}
 {% block content %}
 <h1>Catálogo de Livros</h1>
-<form method="get" action="{% url 'index' %}" class="mb-3">
-  <div class="input-group">
-    <input type="text" name="search" class="form-control" placeholder="Buscar por título..." value="{{ query }}">
-    <button class="btn btn-primary" type="submit">Buscar</button>
-  </div>
+
+<!-- Barra de Pesquisa -->
+<form method="get">
+  <input type="text" name="search" placeholder="Buscar..." value="{{ query }}">
+  <button type="submit">Buscar</button>
 </form>
-<div class="mb-3">
-  <strong>Filtrar por tag:</strong>
-  {% for tag in tags %}
-    <a href="{% url 'index' %}?tag={{ tag.name }}" class="btn btn-sm btn-outline-secondary">{{ tag.name }}</a>
-  {% endfor %}
-</div>
-<table class="table table-striped">
+
+<!-- Filtro por Tags -->
+Filtrar por tag:
+{% for tag in tags %}
+  <a href="?tag={{ tag.name }}">{{ tag.name }}</a>
+{% endfor %}
+
+<!-- Lista de Livros -->
+<table class="table table-bordered">
   <thead>
     <tr>
       <th>Título</th>
       <th>Autor</th>
       <th>Tags</th>
       <th>Status</th>
+      <th>Quantidade Disponível</th>
       <th>Ações</th>
     </tr>
   </thead>
@@ -35,20 +38,19 @@
         {% endfor %}
       </td>
       <td>
-        {% if book.available %}
+        {% if book.available_quantity > 0 %}
           Disponível
         {% else %}
-          Emprestado
+          Indisponível
         {% endif %}
       </td>
+      <td>{{ book.available_quantity }}</td>
       <td>
-        <!-- Botão "Emprestar" visível apenas para administradores -->
-        {% if user.is_staff and book.available %}
-          <a href="{% url 'borrow_book' book.id %}" class="btn btn-sm btn-primary">Emprestar</a>
+        {% if user.is_staff and book.available_quantity > 0 %}
+          <a href="{% url 'borrow_book' book.id %}" class="btn btn-primary">Emprestar</a>
         {% endif %}
-        <!-- Botão "Editar" visível apenas para administradores -->
         {% if user.is_staff %}
-          <a href="{% url 'edit_book' book.id %}" class="btn btn-sm btn-warning">Editar</a>
+          <a href="{% url 'edit_book' book.id %}" class="btn btn-warning">Editar</a>
         {% endif %}
       </td>
     </tr>
