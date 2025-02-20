@@ -7,6 +7,10 @@ import os, shutil
 from .models import Book, Tag, Borrow
 from .forms import BookForm, BorrowForm, ReturnForm, TagForm
 from django.utils import timezone
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+import logging
+
 
 # Função para verificar se o usuário é administrador (staff)
 def is_admin(user):
@@ -173,3 +177,65 @@ def emprestimo_view(request):
     if query:
         books = books.filter(title__icontains=query)
     return render(request, 'livros/emprestimo.html', {'books': books, 'query': query})
+
+
+logger = logging.getLogger(__name__)
+
+@login_required
+@user_passes_test(is_admin)
+def backup_list(request):
+    backup_dir = os.path.join(settings.BASE_DIR, 'backup')
+    if not os.path.exists(backup_dir):
+        os.makedirs(backup_dir)
+    backups = [f for f in os.listdir(backup_dir) if f.endswith('.db')]
+    return render(request, 'livros/admin_panel.html', {'backups': backups})
+
+@login_required
+@user_passes_test(is_admin)
+def import_backup(request):
+    backup_dir = os.path.join(settings.BASE_DIR, 'backup')
+    db_path = settings.DATABASES['default']['NAME']
+
+    if request.method == 'POST':
+        # Verifica se é uma confirmação de importação
+        if 'confirm_import' in request.POST:
+            selected_backup = request.POST.get('selected_backup')
+            backup_file_path = os.path.join(backup_dir, selected_backup)
+
+            try:
+                # Cria um backup temporário antes de substituir
+                timestamp = timezone.now().strftime('%Y%m%d_%H%M%S')
+                temp_backup_path = os.path.join(backup_dir, f'temp_backup_{timestamp}.db')
+                shutil.copy(db_path, temp_backup_path)
+
+                # Substitui o banco de dados atual pelo backup selecionado
+                shutil.copy(backup_file_path, db_path)
+
+                # Registra o log
+                logger.info(f"Backup importado: {selected_backup}")
+                messages.success(request, 'Backup importado com sucesso!')
+            except Exception as e:
+                logger.error(f"Erro ao importar backup: {str(e)}")
+                messages.error(request, f'Erro ao importar backup: {str(e)}')
+
+            return redirect('admin_panel')
+
+        # Verifica se é um upload de arquivo
+        elif 'backup_file' in request.FILES:
+            backup_file = request.FILES['backup_file']
+            try:
+                # Salva o arquivo temporariamente
+                with open(db_path, 'wb+') as destination:
+                    for chunk in backup_file.chunks():
+                        destination.write(chunk)
+
+                # Registra o log
+                logger.info(f"Backup importado via upload: {backup_file.name}")
+                messages.success(request, 'Backup importado com sucesso!')
+            except Exception as e:
+                logger.error(f"Erro ao importar backup via upload: {str(e)}")
+                messages.error(request, f'Erro ao importar backup: {str(e)}')
+
+            return redirect('admin_panel')
+
+    return redirect('admin_panel')

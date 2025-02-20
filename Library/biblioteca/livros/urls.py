@@ -13,5 +13,7 @@ urlpatterns = [
     path('manage_tags/', views.manage_tags, name='manage_tags'),
     path('backup/', views.backup, name='backup'),
     path('tags/delete/<int:tag_id>/', views.delete_tag, name='delete_tag'),
-    path('emprestimo/', views.emprestimo_view, name='emprestimo'),  
+    path('emprestimo/', views.emprestimo_view, name='emprestimo'),
+    path('import_backup/', views.import_backup, name='import_backup'),
+    path('backup_list/', views.backup_list, name='backup_list'),  
 ]

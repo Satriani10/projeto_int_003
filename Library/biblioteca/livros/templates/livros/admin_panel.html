@@ -3,6 +3,39 @@
 {% block content %}
 <h2>Painel Administrativo</h2>
 
+<!-- Botão de Backup -->
+<a href="{% url 'backup' %}" class="btn btn-primary mb-3">Fazer Backup</a>
+
+<!-- Listagem de Backups Disponíveis -->
+<h3>Backups Disponíveis</h3>
+{% if backups %}
+<ul>
+  {% for backup in backups %}
+  <li>
+    {{ backup }}
+    <form method="post" action="{% url 'import_backup' %}" style="display:inline;">
+      {% csrf_token %}
+      <input type="hidden" name="selected_backup" value="{{ backup }}">
+      <button type="submit" name="confirm_import" class="btn btn-sm btn-success">Importar</button>
+    </form>
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p>Nenhum backup disponível.</p>
+{% endif %}
+
+<!-- Formulário para Importar Backup -->
+<h3>Importar Backup</h3>
+<form method="post" action="{% url 'import_backup' %}" enctype="multipart/form-data">
+  {% csrf_token %}
+  <div class="mb-3">
+    <label for="backup_file" class="form-label">Selecione o arquivo de backup (.db):</label>
+    <input type="file" class="form-control" id="backup_file" name="backup_file" accept=".db" required>
+  </div>
+  <button type="submit" class="btn btn-success">Importar Backup</button>
+</form>
+
 <!-- Lista de Livros -->
 <h3>Livros</h3>
 <a href="{% url 'emprestimo' %}" class="btn btn-primary mb-3">Ir para Empréstimos</a>
