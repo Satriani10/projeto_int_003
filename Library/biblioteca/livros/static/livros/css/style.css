@@ -1,161 +1,284 @@
 /* Reset básico */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-  
-  /* Estilo global */
-  body {
-    font-family: 'Arial', sans-serif;
-    background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
-    color: #333;
-    line-height: 1.6;
-  }
-  
-  /* Navbar */
-  .navbar {
-    background: linear-gradient(135deg, #ffffff, #e9ecef);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  .navbar-brand.logo {
-    font-family: 'Poppins', sans-serif;
-    font-weight: bold;
-    font-size: 1.5rem;
-    color: #333 !important;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-  }
-  
-  .navbar-brand.logo:hover {
-    color: #ff6f61 !important; /* Rosa chamativo */
-  }
-  
-  .navbar-nav .nav-link {
-    color: #495057 !important;
-    font-weight: 500;
-    transition: color 0.3s ease;
-  }
-  
-  .navbar-nav .nav-link:hover {
-    color: #ff6f61 !important; /* Rosa chamativo */
-  }
-  
-  /* Container principal */
-  .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-    background: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    margin-top: 20px;
-  }
-  
-  /* Mensagens de alerta */
-  .alert {
-    border-radius: 8px;
-    font-size: 0.9rem;
-    background: #fff3cd;
-    color: #856404;
-    border: 1px solid #ffeeba;
-  }
-  
-  .alert-dismissible .btn-close {
-    color: #856404;
-  }
-  
-  /* Animação de entrada */
-  @keyframes fadeIn {
-    from {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Estilo global */
+body {
+  font-family: 'Arial', sans-serif;
+  background: linear-gradient(135deg, #f5f7fa, #c3cfe2); /* Fundo claro para neumorphism */
+  color: #333;
+  line-height: 1.6;
+}
+
+/* Classe base para neumorphism */
+.neumorphic {
+  background: #e0e5ec; /* Mesma cor do fundo */
+  border-radius: 12px; /* Bordas arredondadas */
+  box-shadow: 
+      9px 9px 18px rgba(0, 0, 0, 0.1), /* Sombra externa */
+      -9px -9px 18px rgba(255, 255, 255, 0.7); /* Sombra interna */
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Animação suave */
+}
+
+.neumorphic:hover {
+  box-shadow: 
+      6px 6px 12px rgba(0, 0, 0, 0.1), /* Sombra externa mais suave */
+      -6px -6px 12px rgba(255, 255, 255, 0.7); /* Sombra interna mais suave */
+  transform: translateY(-2px); /* Efeito de elevação */
+}
+
+/* Navbar */
+.navbar {
+  background: linear-gradient(135deg, #ffffff, #e9ecef);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand.logo {
+  font-family: 'Poppins', sans-serif;
+  font-weight: bold;
+  font-size: 1.5rem;
+  color: #333 !important;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.navbar-brand.logo:hover {
+  color: #ff6f61 !important; /* Rosa chamativo */
+}
+
+.navbar-nav .nav-link {
+  color: #495057 !important;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.navbar-nav .nav-link:hover {
+  color: #ff6f61 !important; /* Rosa chamativo */
+}
+
+/* Container principal */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+}
+
+/* Mensagens de alerta */
+.alert {
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+}
+
+.alert-dismissible .btn-close {
+  color: #856404;
+}
+
+/* Animação de entrada */
+@keyframes fadeIn {
+  from {
       opacity: 0;
       transform: translateY(-20px);
-    }
-    to {
+  }
+  to {
       opacity: 1;
       transform: translateY(0);
-    }
   }
-  
-  .fadeIn {
-    animation: fadeIn 0.8s ease-in-out;
-  }
-  
-  .slide-in-bottom {
-    animation: slideInBottom 0.6s ease-out;
-  }
-  
-  @keyframes slideInBottom {
-    from {
+}
+
+.fadeIn {
+  animation: fadeIn 0.8s ease-in-out;
+}
+
+.slide-in-bottom {
+  animation: slideInBottom 0.6s ease-out;
+}
+
+@keyframes slideInBottom {
+  from {
       opacity: 0;
       transform: translateY(20px);
-    }
-    to {
+  }
+  to {
       opacity: 1;
       transform: translateY(0);
-    }
   }
-  
-  /* Botões */
-  .btn-primary {
-    background: linear-gradient(135deg, #ff6f61, #ff9a8b);
-    border: none;
-    color: #fff;
-    font-weight: bold;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-  
-  .btn-primary:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  }
-  
-  .btn-warning {
-    background: linear-gradient(135deg, #ffc107, #ffca28);
-    border: none;
-    color: #333;
-    font-weight: bold;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-  
-  .btn-warning:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  }
-  
-  /* Tabelas */
-  .table {
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .table thead th {
-    background: #f8f9fa;
-    border-bottom: 2px solid #dee2e6;
-  }
-  
-  .table tbody tr:hover {
-    background-color: #f1f3f5;
-  }
-  
-  /* Badges (tags) */
-  .badge {
-    font-size: 0.8rem;
-    padding: 5px 10px;
-    border-radius: 20px;
-    background: linear-gradient(135deg, #6e8efb, #a777e3);
-    color: #fff;
-  }
-  
-  /* Footer (opcional) */
-  footer {
-    text-align: center;
-    padding: 20px 0;
-    background: linear-gradient(135deg, #ffffff, #e9ecef);
-    border-top: 1px solid #e9ecef;
-    margin-top: 40px;
-    font-size: 0.9rem;
-    color: #6c757d;
-  }
+}
+
+/* Botões */
+.btn-primary {
+  background: linear-gradient(135deg, #ff6f61, #ff9a8b);
+  border: none;
+  color: #fff;
+  font-weight: bold;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-primary:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.btn-warning {
+  background: linear-gradient(135deg, #ffc107, #ffca28);
+  border: none;
+  color: #333;
+  font-weight: bold;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-warning:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Estilo para tabelas com neumorphism */
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #e0e5ec; /* Mesma cor do fundo */
+  box-shadow: 
+      6px 6px 12px rgba(0, 0, 0, 0.1), /* Sombra externa */
+      -6px -6px 12px rgba(255, 255, 255, 0.7); /* Sombra interna */
+  margin-bottom: 20px;
+}
+
+.table thead th {
+  background: linear-gradient(135deg, #ffffff, #e9ecef);
+  color: #333;
+  font-weight: bold;
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.table tbody td {
+  padding: 12px;
+  background: #ffffff;
+  color: #333;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table tbody tr:hover {
+  background: #f8f9fa;
+}
+/* Estilo para links de tags */
+.tag-link {
+  display: inline-block;
+  padding: 5px 10px;
+  margin: 2px;
+  border-radius: 12px;
+  background: #e0e5ec; /* Mesma cor do fundo */
+  box-shadow: 
+      6px 6px 12px rgba(0, 0, 0, 0.1), /* Sombra externa */
+      -6px -6px 12px rgba(255, 255, 255, 0.7); /* Sombra interna */
+  color: #333;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tag-link:hover {
+  box-shadow: 
+      4px 4px 8px rgba(0, 0, 0, 0.1), /* Sombra externa mais suave */
+      -4px -4px 8px rgba(255, 255, 255, 0.7); /* Sombra interna mais suave */
+  transform: translateY(-2px); /* Efeito de elevação */
+}
+
+/* Estilo para badges (tags nos livros) */
+.badge {
+  display: inline-block;
+  padding: 5px 10px;
+  margin: 2px;
+  border-radius: 12px;
+  background: #d4a3d8; /* Mesma cor do fundo */
+  box-shadow: 
+      6px 6px 12px rgba(0, 0, 0, 0.1), /* Sombra externa */
+      -6px -6px 12px rgba(255, 255, 255, 0.7); /* Sombra interna */
+  color: #333;
+  font-size: 0.9rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.badge:hover {
+  box-shadow: 
+      4px 4px 8px rgba(0, 0, 0, 0.1), /* Sombra externa mais suave */
+      -4px -4px 8px rgba(255, 255, 255, 0.7); /* Sombra interna mais suave */
+  transform: translateY(-2px); /* Efeito de elevação */
+}
+
+/* Footer (opcional) */
+footer {
+  text-align: center;
+  padding: 20px 0;
+  background: linear-gradient(135deg, #ffffff, #e9ecef);
+  border-top: 1px solid #e9ecef;
+  margin-top: 40px;
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+/* Estilo para a barra de filtro (input ou select) */
+.filter-bar {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 12px;
+  background: #e0e5ec; /* Mesma cor do fundo */
+  box-shadow: 
+      6px 6px 12px rgba(0, 0, 0, 0.1), /* Sombra externa */
+      -6px -6px 12px rgba(255, 255, 255, 0.7); /* Sombra interna */
+  font-size: 1rem;
+  color: #333;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.filter-bar:focus {
+  outline: none;
+  box-shadow: 
+      4px 4px 8px rgba(0, 0, 0, 0.1), /* Sombra externa mais suave */
+      -4px -4px 8px rgba(255, 255, 255, 0.7); /* Sombra interna mais suave */
+  transform: translateY(-2px); /* Efeito de elevação */
+}
+
+/* Estilo para botões com neumorphism */
+.button-neumorphic {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 12px;
+  background: #e0e5ec; /* Mesma cor do fundo */
+  box-shadow: 
+      6px 6px 12px rgba(0, 0, 0, 0.1), /* Sombra externa */
+      -6px -6px 12px rgba(255, 255, 255, 0.7); /* Sombra interna */
+  color: #333;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.button-neumorphic:hover {
+  box-shadow: 
+      4px 4px 8px rgba(0, 0, 0, 0.1), /* Sombra externa mais suave */
+      -4px -4px 8px rgba(255, 255, 255, 0.7); /* Sombra interna mais suave */
+  transform: translateY(-2px); /* Efeito de elevação */
+}
+
+.button-neumorphic:focus {
+  outline: none;
+}

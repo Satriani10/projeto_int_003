@@ -10,52 +10,62 @@
 </head>
 <body>
 <!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-light shadow-sm" style="background: linear-gradient(135deg, #f8f9fa, #e9ecef);">
+<nav class="navbar navbar-expand-lg navbar-light shadow-sm neumorphic">
   <div class="container-fluid">
     <!-- Logo -->
     <a class="navbar-brand logo d-flex align-items-center" href="{% url 'index' %}">
       <i class="fas fa-book me-2" style="color: #ff6f61;"></i> <!-- Ícone de livro -->
       <span class="fw-bold">Biblioteca</span>
     </a>
-
     <!-- Menu principal -->
     <div class="d-flex flex-wrap justify-content-between w-100">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         {% if user.is_staff %}
+        <!-- Painel Admin -->
         <li class="nav-item">
-          <a class="nav-link d-flex align-items-center" href="{% url 'admin_panel' %}">
+          <a class="nav-link d-flex align-items-center neumorphic" href="{% url 'admin_panel' %}">
             <i class="fas fa-tachometer-alt me-2"></i> Painel Admin
           </a>
         </li>
+        <!-- Adicionar Livro -->
         <li class="nav-item">
-          <a class="nav-link d-flex align-items-center" href="{% url 'add_book' %}">
+          <a class="nav-link d-flex align-items-center neumorphic" href="{% url 'add_book' %}">
             <i class="fas fa-plus me-2"></i> Adicionar Livro
           </a>
         </li>
+        <!-- Gerenciar Tags -->
         <li class="nav-item">
-          <a class="nav-link d-flex align-items-center" href="{% url 'manage_tags' %}">
+          <a class="nav-link d-flex align-items-center neumorphic" href="{% url 'manage_tags' %}">
             <i class="fas fa-tags me-2"></i> Gerenciar Tags
           </a>
         </li>
+        <!-- Backup -->
         <li class="nav-item">
-          <a class="nav-link d-flex align-items-center" href="{% url 'backup' %}">
+          <a class="nav-link d-flex align-items-center neumorphic" href="{% url 'backup' %}">
             <i class="fas fa-database me-2"></i> Backup
+          </a>
+        </li>
+        <!-- Livros Emprestados -->
+        <li class="nav-item">
+          <a class="nav-link d-flex align-items-center neumorphic" href="{% url 'list_loans' %}">
+            <i class="fas fa-book-reader me-2"></i> Livros Emprestados
           </a>
         </li>
         {% endif %}
       </ul>
-
       <!-- Menu de autenticação -->
       <ul class="navbar-nav">
         {% if user.is_authenticated %}
+        <!-- Logout -->
         <li class="nav-item">
-          <a class="nav-link d-flex align-items-center" href="{% url 'logout' %}">
+          <a class="nav-link d-flex align-items-center neumorphic" href="{% url 'logout' %}">
             <i class="fas fa-sign-out-alt me-2"></i> Logout
           </a>
         </li>
         {% else %}
+        <!-- Login -->
         <li class="nav-item">
-          <a class="nav-link d-flex align-items-center" href="{% url 'login' %}">
+          <a class="nav-link d-flex align-items-center neumorphic" href="{% url 'login' %}">
             <i class="fas fa-sign-in-alt me-2"></i> Login
           </a>
         </li>
@@ -64,9 +74,8 @@
     </div>
   </div>
 </nav>
-
 <!-- Conteúdo principal -->
-<div class="container fadeIn mt-4" style="background: #ffffff; border-radius: 12px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); padding: 20px;">
+<div class="container fadeIn mt-4 neumorphic" style="padding: 20px;">
     <!-- Mensagens de alerta -->
     {% if messages %}
     {% for message in messages %}
@@ -76,11 +85,9 @@
     </div>
     {% endfor %}
     {% endif %}
-
     <!-- Bloco de conteúdo -->
     {% block content %}{% endblock %}
 </div>
-
 <!-- Scripts -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{% static 'livros/js/script.js' %}"></script>

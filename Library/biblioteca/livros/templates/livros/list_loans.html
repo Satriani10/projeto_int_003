@@ -1,0 +1,39 @@
+{% extends "livros/base.html" %}
+{% block title %}Livros Emprestados{% endblock %}
+{% block content %}
+<h1>Livros Emprestados</h1>
+<table class="table neumorphic">
+  <thead>
+    <tr>
+      <th>Título</th>
+      <th>Aluno</th>
+      <th>Número do Aluno</th>
+      <th>Data do Empréstimo</th>
+      <th>Status</th>
+      <th>Ações</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for loan in loans %}
+    <tr>
+      <td>{{ loan.book.title }}</td>
+      <td>{{ loan.student_name }}</td>
+      <td>{{ loan.student_id }}</td>
+      <td>{{ loan.borrowed_date }}</td>
+      <td>
+        {% if loan.returned_date %}
+          Devolvido
+        {% else %}
+          Emprestado
+        {% endif %}
+      </td>
+      <td>
+        {% if not loan.returned_date %}
+          <a href="{% url 'return_book' loan.id %}" class="btn btn-warning button-neumorphic">Devolver</a>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

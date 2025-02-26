@@ -1,11 +1,16 @@
-
 {% extends "livros/base.html" %}
 {% block title %}Registrar Devolução{% endblock %}
 {% block content %}
-<h2>Registrar Devolução para: {{ borrow.book.title }}</h2>
-<form method="post">
+<h2>Registrar Devolução: {{ loan.book.title }}</h2>
+<form method="post" class="neumorphic p-4">
   {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit" class="btn btn-success">Registrar Devolução</button>
+  <div class="mb-3">
+    <label for="id_return_date" class="form-label">Data da Devolução</label>
+    {{ form.return_date }}
+    {% if form.errors.return_date %}
+      <div class="text-danger">{{ form.errors.return_date }}</div>
+    {% endif %}
+  </div>
+  <button type="submit" class="btn btn-primary button-neumorphic">Confirmar Devolução</button>
 </form>
 {% endblock %}

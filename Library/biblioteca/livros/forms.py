@@ -1,7 +1,9 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.timezone import now
-from .models import Book, Borrow, Tag
+from .models import Book, Tag
+from django import forms
+from .models import Loan
 
 class BookForm(forms.ModelForm):
     # Campo para entrada de tags separadas por vírgula
@@ -43,7 +45,7 @@ class BorrowForm(forms.ModelForm):
     )
 
     class Meta:
-        model = Borrow
+        model = Loan
         fields = ['expiration_date']
 
     def clean_expiration_date(self):
@@ -53,6 +55,8 @@ class BorrowForm(forms.ModelForm):
         return expiration_date
 
 
+
+
 class ReturnForm(forms.ModelForm):
     return_date = forms.DateTimeField(
         widget=forms.DateTimeInput(attrs={'type': 'datetime-local'}),
@@ -60,18 +64,31 @@ class ReturnForm(forms.ModelForm):
     )
 
     class Meta:
-        model = Borrow
+        model = Loan
         fields = ['return_date']
 
     def clean_return_date(self):
         return_date = self.cleaned_data.get('return_date')
         borrowed_date = self.instance.borrowed_date
-        if return_date and return_date <= borrowed_date:
-            raise ValidationError("A data de devolução deve ser posterior à data de empréstimo.")
+
+        # Converte return_date para date antes da comparação
+        if return_date and return_date.date() <= borrowed_date:
+            raise forms.ValidationError("A data de devolução deve ser posterior à data de empréstimo.")
         return return_date
-
-
+    
+    
 class TagForm(forms.ModelForm):
     class Meta:
         model = Tag
         fields = ['name']
+        
+
+
+class LoanForm(forms.ModelForm):
+    class Meta:
+        model = Loan
+        fields = ['student_name', 'student_id']
+        widgets = {
+            'student_name': forms.TextInput(attrs={'class': 'form-control filter-bar', 'placeholder': 'Nome do Aluno'}),
+            'student_id': forms.TextInput(attrs={'class': 'form-control filter-bar', 'placeholder': 'Número do Aluno'}),
+        }

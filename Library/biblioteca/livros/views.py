@@ -1,18 +1,18 @@
+import os
+import shutil
+import logging
+from django.conf import settings
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.conf import settings
-import os, shutil
-from .models import Book, Tag, Borrow
-from .forms import BookForm, BorrowForm, ReturnForm, TagForm
 from django.utils import timezone
-from django.core.files.storage import default_storage
-from django.core.files.base import ContentFile
-import logging
+from .models import Book, Tag, Loan
+from .forms import BookForm, LoanForm, ReturnForm, TagForm
 
+logger = logging.getLogger(__name__)
 
-# Função para verificar se o usuário é administrador 
+# Função para verificar se o usuário é administrador
 def is_admin(user):
     return user.is_staff
 
@@ -20,20 +20,14 @@ def index(request):
     query = request.GET.get('search', '')
     tag_filter = request.GET.get('tag', '')
     books = Book.objects.all()
-    
+
     if query:
         books = books.filter(title__icontains=query)
     if tag_filter:
         books = books.filter(tags__name=tag_filter)
-    
+
     tags = Tag.objects.all()
-    
-    return render(request, 'livros/index.html', {
-        'books': books,
-        'tags': tags,
-        'query': query,
-        'tag_filter': tag_filter,
-    })
+    return render(request, 'livros/index.html', {'books': books, 'tags': tags, 'query': query, 'tag_filter': tag_filter})
 
 def user_login(request):
     if request.method == 'POST':
@@ -57,13 +51,9 @@ def user_logout(request):
 @user_passes_test(is_admin)
 def admin_panel(request):
     books = Book.objects.all()
-    borrows = Borrow.objects.all()  # Certifique-se de que esta consulta está funcionando
+    loans = Loan.objects.all()
     tags = Tag.objects.all()
-    return render(request, 'livros/admin_panel.html', {
-        'books': books,
-        'borrows': borrows,
-        'tags': tags,
-    })
+    return render(request, 'livros/admin_panel.html', {'books': books, 'loans': loans, 'tags': tags})
 
 @login_required
 @user_passes_test(is_admin)
@@ -95,50 +85,57 @@ def edit_book(request, book_id):
 @login_required
 def borrow_book(request, book_id):
     book = get_object_or_404(Book, pk=book_id)
-    if book.available_quantity <= 0:
-        messages.error(request, 'Livro indisponível para empréstimo.')
-        return redirect('index')
     
-    if request.method == 'POST':
-        form = BorrowForm(request.POST)
-        if form.is_valid():
-            borrow = form.save(commit=False)
-            borrow.book = book
-            borrow.user = request.user
-            borrow.save()
-            
-            # Atualiza a quantidade disponível
-            book.available_quantity -= 1
-            book.save()
-            
-            messages.success(request, 'Livro emprestado com sucesso!')
-            return redirect('index')
+    if book.available_quantity > 0:
+        if request.method == 'POST':
+            form = LoanForm(request.POST)
+            if form.is_valid():
+                loan = form.save(commit=False)
+                loan.book = book
+                loan.save()
+
+                # Atualiza a quantidade disponível do livro
+                book.available_quantity -= 1
+                book.save()
+
+                messages.success(request, 'Livro emprestado com sucesso!')
+                return redirect('index')
+        else:
+            form = LoanForm()
+        return render(request, 'livros/borrow.html', {'form': form, 'book': book})
     else:
-        form = BorrowForm()
-    
-    return render(request, 'livros/borrow.html', {'form': form, 'book': book})
+        messages.error(request, 'Este livro não está disponível para empréstimo.')
+        return redirect('index')
 
 @login_required
 @user_passes_test(is_admin)
-def return_book(request, borrow_id):
-    borrow = get_object_or_404(Borrow, pk=borrow_id)
+def return_book(request, loan_id):
+    loan = get_object_or_404(Loan, pk=loan_id)
+
     if request.method == 'POST':
-        form = ReturnForm(request.POST, instance=borrow)
+        form = ReturnForm(request.POST, instance=loan)
         if form.is_valid():
-            borrow = form.save(commit=False)
-            borrow.return_date = timezone.now()
-            borrow.save()
-            
-            # Atualiza a quantidade disponível
-            borrow.book.available_quantity += 1
-            borrow.book.save()
-            
+            # Salva a data de devolução
+            loan = form.save(commit=False)
+            loan.returned_date = form.cleaned_data['return_date'].date()  # Define a data de devolução
+            loan.save()
+
+            # Atualiza a quantidade disponível do livro
+            loan.book.available_quantity += 1
+            loan.book.save()
+
+            # Exibe mensagem de sucesso
             messages.success(request, 'Livro marcado como devolvido.')
-            return redirect('admin_panel')
+            return redirect('list_loans')  # Redireciona para a lista de empréstimos
     else:
-        form = ReturnForm(instance=borrow)
-    
-    return render(request, 'livros/return_book.html', {'form': form, 'borrow': borrow})
+        form = ReturnForm(instance=loan)
+
+    return render(request, 'livros/return_book.html', {'form': form, 'loan': loan})
+@login_required
+@user_passes_test(is_admin)
+def list_loans(request):
+    loans = Loan.objects.filter(returned_date__isnull=True)
+    return render(request, 'livros/list_loans.html', {'loans': loans})
 
 @login_required
 @user_passes_test(is_admin)
@@ -156,23 +153,12 @@ def manage_tags(request):
 
 @login_required
 @user_passes_test(is_admin)
-def delete_tag(request, tag_id):
-    tag = get_object_or_404(Tag, pk=tag_id)
-    if request.method == 'POST':
-        tag.delete()
-        messages.success(request, f'Tag "{tag.name}" excluída com sucesso!')
-        return redirect('manage_tags')
-    return render(request, 'livros/delete_tag_confirm.html', {'tag': tag})
-
-@login_required
-@user_passes_test(is_admin)
 def backup(request):
     backup_dir = os.path.join(settings.BASE_DIR, 'backup')
     if not os.path.exists(backup_dir):
         os.makedirs(backup_dir)
     db_path = settings.DATABASES['default']['NAME']
-    from datetime import datetime
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    timestamp = timezone.now().strftime('%Y%m%d_%H%M%S')
     backup_filename = f'library_backup_{timestamp}.db'
     backup_path = os.path.join(backup_dir, backup_filename)
     try:
@@ -181,6 +167,16 @@ def backup(request):
     except Exception as e:
         messages.error(request, f'Erro ao fazer backup: {str(e)}')
     return redirect('admin_panel')
+
+@login_required
+@user_passes_test(is_admin)
+def delete_tag(request, tag_id):
+    tag = get_object_or_404(Tag, pk=tag_id)
+    if request.method == 'POST':
+        tag.delete()
+        messages.success(request, f'Tag "{tag.name}" excluída com sucesso!')
+        return redirect('manage_tags')
+    return render(request, 'livros/delete_tag_confirm.html', {'tag': tag})
 
 @login_required
 def emprestimo_view(request):
@@ -192,8 +188,6 @@ def emprestimo_view(request):
     
     return render(request, 'livros/emprestimo.html', {'books': books, 'query': query})
 
-logger = logging.getLogger(__name__)
-
 @login_required
 @user_passes_test(is_admin)
 def backup_list(request):
@@ -202,6 +196,8 @@ def backup_list(request):
         os.makedirs(backup_dir)
     backups = [f for f in os.listdir(backup_dir) if f.endswith('.db')]
     return render(request, 'livros/admin_panel.html', {'backups': backups})
+
+
 
 @login_required
 @user_passes_test(is_admin)
@@ -232,8 +228,7 @@ def import_backup(request):
                 messages.error(request, f'Erro ao importar backup: {str(e)}')
 
             return redirect('admin_panel')
-
-        # Verifica se é um upload de arquivo
+        
         elif 'backup_file' in request.FILES:
             backup_file = request.FILES['backup_file']
             try:

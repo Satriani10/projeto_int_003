@@ -2,19 +2,16 @@
 {% block title %}Biblioteca - Home{% endblock %}
 {% block content %}
 <h1>Catálogo de Livros</h1>
-
 <!-- Barra de Pesquisa -->
 <form method="get">
   <input type="text" name="search" placeholder="Buscar..." value="{{ query }}">
-  <button type="submit">Buscar</button>
+  <button type="submit" class="button-neumorphic">Buscar</button>
 </form>
-
 <!-- Filtro por Tags -->
 Filtrar por tag:
 {% for tag in tags %}
-  <a href="?tag={{ tag.name }}">{{ tag.name }}</a>
+  <a href="?tag={{ tag.name }}" class="tag-link">{{ tag.name }}</a>
 {% endfor %}
-
 <!-- Lista de Livros -->
 <table class="table table-bordered">
   <thead>
@@ -34,7 +31,7 @@ Filtrar por tag:
       <td>{{ book.author }}</td>
       <td>
         {% for tag in book.tags.all %}
-          <span class="badge bg-secondary">{{ tag.name }}</span>
+          <span class="badge">{{ tag.name }}</span>
         {% endfor %}
       </td>
       <td>

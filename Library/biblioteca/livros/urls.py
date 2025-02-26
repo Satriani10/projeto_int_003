@@ -9,11 +9,13 @@ urlpatterns = [
     path('add_book/', views.add_book, name='add_book'),
     path('edit_book/<int:book_id>/', views.edit_book, name='edit_book'),
     path('borrow_book/<int:book_id>/', views.borrow_book, name='borrow_book'),
-    path('return_book/<int:borrow_id>/', views.return_book, name='return_book'),
+    path('return_book/<int:borrow_id>/', views.return_book, name='return_book'), #tirar dps acho
     path('manage_tags/', views.manage_tags, name='manage_tags'),
     path('backup/', views.backup, name='backup'),
     path('tags/delete/<int:tag_id>/', views.delete_tag, name='delete_tag'),
     path('emprestimo/', views.emprestimo_view, name='emprestimo'),
     path('import_backup/', views.import_backup, name='import_backup'),
     path('backup_list/', views.backup_list, name='backup_list'),  
+    path('loans/', views.list_loans, name='list_loans'),
+    path('return/<int:loan_id>/', views.return_book, name='return_book')
 ]

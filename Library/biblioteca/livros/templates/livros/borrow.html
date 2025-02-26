@@ -1,11 +1,17 @@
-
 {% extends "livros/base.html" %}
 {% block title %}Emprestar Livro{% endblock %}
 {% block content %}
-<h2>Emprestar Livro: {{ book.title }}</h2>
-<form method="post">
+<h2 class="mb-4">Emprestar Livro: {{ book.title }}</h2>
+<form method="post" class="neumorphic p-4">
   {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit" class="btn btn-primary">Emprestar</button>
+  <div class="mb-3">
+    <label for="id_student_name" class="form-label">Nome do Aluno</label>
+    {{ form.student_name }}
+  </div>
+  <div class="mb-3">
+    <label for="id_student_id" class="form-label">Número do Aluno</label>
+    {{ form.student_id }}
+  </div>
+  <button type="submit" class="btn btn-primary button-neumorphic">Confirmar Empréstimo</button>
 </form>
 {% endblock %}
