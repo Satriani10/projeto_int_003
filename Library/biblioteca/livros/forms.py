@@ -24,7 +24,7 @@ class BookForm(forms.ModelForm):
 
     class Meta:
         model = Book
-        fields = ['title', 'author', 'tags']  # Adicione 'tags' aqui
+        fields = ['title', 'author', 'tags'] 
 
     def clean_unit_codes(self):
         unit_codes_str = self.cleaned_data.get('unit_codes', '')
@@ -58,7 +58,7 @@ class BookForm(forms.ModelForm):
         
         for tag in tags:
             tag_instance, created = Tag.objects.get_or_create(name=tag)
-            instance.tags.add(tag_instance)  # Se 'tags' for um ManyToManyField no modelo
+            instance.tags.add(tag_instance) 
 
         return instance
 

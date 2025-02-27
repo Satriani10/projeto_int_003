@@ -40,7 +40,7 @@ def index(request):
                 'title': book.title,
                 'unit_count': 0,
                 'tags': book.tags.all(),
-                'available': True  # ou False, dependendo de sua lógica
+                'available': True  
             }
         book_counts[book]['unit_count'] += 1
 
@@ -134,7 +134,7 @@ def borrow_book(request, pk):
             unit.available = False
             unit.save()
             messages.success(request, "Empréstimo confirmado com sucesso!")
-            return redirect('index')  # Redireciona para a página inicial
+            return redirect('index')  
         else:
             messages.error(request, "Erro ao processar o formulário. Por favor, verifique os campos.")
     else:
