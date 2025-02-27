@@ -5,10 +5,7 @@
 
 <!-- Botão de Backup -->
 <a href="{% url 'backup' %}" class="btn btn-primary mb-3">Fazer Backup</a>
-<!-- Botão para acessar o Admin do Django -->
-<a href="/admin" class="btn btn-primary button-neumorphic">
-  Acessar Admin Django
-</a>
+<a href="/admin" class="btn btn-primary button-neumorphic">Acessar Admin Django</a>
 
 <!-- Listagem de Backups Disponíveis -->
 {% if backups %}
@@ -45,9 +42,8 @@
 <table class="table table-bordered">
   <thead>
     <tr>
-      <th>ID</th>
       <th>Título do Livro</th>
-      <th>Código da Unidade</th>
+      <th>Quantidade</th>
       <th>Status</th>
       <th>Tags</th>
       <th>Ações</th>
@@ -55,12 +51,10 @@
   </thead>
   <tbody>
     {% for book in books %}
-      {% for unit in book.units.all %}
       <tr>
-        <td>{{ unit.id }}</td>
         <td>{{ book.title }}</td>
-        <td>{{ unit.code }}</td>
-        <td>{{ unit.available|yesno:"Disponível,Emprestado" }}</td>
+        <td>{{ book.get_unit_count }} unidades</td>
+        <td>{{ book.units.first.available|yesno:"Disponível,Emprestado" }}</td>
         <td>
           {% for tag in book.tags.all %}
             <span class="badge bg-secondary">{{ tag.name }}</span>
@@ -70,7 +64,6 @@
           <a href="{% url 'edit_book' book.id %}" class="btn btn-sm btn-warning">Editar Livro</a>
         </td>
       </tr>
-      {% endfor %}
     {% endfor %}
   </tbody>
 </table>

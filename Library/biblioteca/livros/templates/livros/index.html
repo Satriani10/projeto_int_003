@@ -15,48 +15,69 @@
   <a href="?tag={{ tag.name }}" class="tag-link">{{ tag.name }}</a>
 {% endfor %}
 
-<!-- Lista de Unidades Disponíveis -->
+<!-- Lista de Livros Disponíveis -->
 <table class="table table-bordered">
   <thead>
     <tr>
       <th>Título do Livro</th>
-      <th>Código da Unidade</th>
+      <th>Quantidade</th>
       <th>Tags</th>
       <th>Status</th>
       <th>Ações</th>
     </tr>
   </thead>
   <tbody>
-    {% for unit in units %}
-    <tr>
-      <td>{{ unit.book.title }}</td>
-      <td>{{ unit.code }}</td>
-      <td>
-        {% for tag in unit.book.tags.all %}
-          <span class="badge">{{ tag.name }}</span>
-        {% endfor %}
-      </td>
-      <td>
-        {% if unit.available %}
-          Disponível
-        {% else %}
-          Emprestado
-        {% endif %}
-      </td>
-      <td>
-        {% if user.is_staff and unit.available %}
-          <a href="{% url 'borrow_book' unit.id %}" class="btn btn-primary">Emprestar</a>
-        {% endif %}
-        {% if user.is_staff %}
-          <a href="{% url 'edit_book' unit.book.id %}" class="btn btn-warning">Editar Livro</a>
-        {% endif %}
-      </td>
-    </tr>
+    {% for book in page_obj %}
+      <tr>
+        <td>{{ book.title }}</td>
+        <td>{{ book.unit_count }} unidades</td>
+        <td>
+          {% for tag in book.tags %}
+            <span class="badge">{{ tag.name }}</span>
+          {% endfor %}
+        </td>
+        <td>
+          {% if book.unit_count > 0 %}
+            Disponível
+          {% else %}
+            Emprestado
+          {% endif %}
+        </td>
+        <td>
+          {% if user.is_staff and book.unit_count > 0 and book.id %}
+            <a href="{% url 'borrow_book' book.id %}" class="btn btn-primary">Emprestar</a>
+          {% endif %}
+          
+          {% if user.is_staff and book.id %}
+            <a href="{% url 'edit_book' book.id %}" class="btn btn-warning">Editar Livro</a>
+          {% endif %}
+        </td>
+      </tr>
     {% empty %}
-    <tr>
-      <td colspan="5" class="text-center">Nenhuma unidade disponível.</td>
-    </tr>
+      <tr>
+        <td colspan="5" class="text-center">Nenhuma unidade disponível.</td>
+      </tr>
     {% endfor %}
   </tbody>
 </table>
+
+<!-- Paginação -->
+<div class="pagination">
+  <span class="step-links">
+    {% if page_obj.has_previous %}
+      <a href="?page=1">&laquo; primeira</a>
+      <a href="?page={{ page_obj.previous_page_number }}">anterior</a>
+    {% endif %}
+    
+    <span class="current">
+      Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
+    </span>
+
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}">próxima</a>
+      <a href="?page={{ page_obj.paginator.num_pages }}">última &raquo;</a>
+    {% endif %}
+  </span>
+</div>
+
 {% endblock %}

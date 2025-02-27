@@ -9,12 +9,13 @@ class Tag(models.Model):
 
 
 class Book(models.Model):
-    title = models.CharField(max_length=200, verbose_name="Título")
-    author = models.CharField(max_length=100, verbose_name="Autor")
-    tags = models.ManyToManyField(Tag, blank=True, verbose_name="Tags")
+    title = models.CharField(max_length=255)
+    author = models.CharField(max_length=255)
+    tags = models.ManyToManyField(Tag)
 
-    def __str__(self):
-        return self.title
+    def get_unit_count(self):
+        # Use 'units' para se referir à relação definida pelo related_name
+        return self.units.filter(available=True).count()
 
 
 class BookUnit(models.Model):

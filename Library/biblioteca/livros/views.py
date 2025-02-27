@@ -10,31 +10,55 @@ from django.utils import timezone
 from .models import Book, Tag, Loan
 from .forms import BookForm, LoanForm, ReturnForm, TagForm, BookUnit
 from .forms import BorrowForm 
-
+from django.core.paginator import Paginator
+from django.db.models import Count, Q
 logger = logging.getLogger(__name__)
 
 # Função para verificar se o usuário é administrador
 def is_admin(user):
     return user.is_staff
 
+
+
 def index(request):
     query = request.GET.get('search', '')
     tag_filter = request.GET.get('tag', '')
-    
+
     # Filtra unidades disponíveis com base no título do livro ou na tag
-    units = BookUnit.objects.filter(available=True)  # Apenas unidades disponíveis
+    units = BookUnit.objects.filter(available=True)
     if query:
-        units = units.filter(book__title__icontains=query)  # Filtra pelo título do livro
+        units = units.filter(book__title__icontains=query)
     if tag_filter:
-        units = units.filter(book__tags__name=tag_filter)  # Filtra pela tag do livro
-    
-    tags = Tag.objects.all()  # Recupera todas as tags
+        units = units.filter(book__tags__name=tag_filter)
+
+    # Agrupa as unidades por livro e conta as disponíveis
+    book_counts = {}
+    for unit in units:
+        book = unit.book
+        if book not in book_counts:
+            book_counts[book] = {
+                'title': book.title,
+                'unit_count': 0,
+                'tags': book.tags.all(),
+                'available': True  # ou False, dependendo de sua lógica
+            }
+        book_counts[book]['unit_count'] += 1
+
+    # Paginação
+    book_list = list(book_counts.values())
+    paginator = Paginator(book_list, 10)  # 10 livros por página
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    tags = Tag.objects.all()
     return render(request, 'livros/index.html', {
-        'units': units,  # Passa as unidades para o template
+        'page_obj': page_obj,
         'tags': tags,
         'query': query,
         'tag_filter': tag_filter
     })
+
+
     
 def user_login(request):
     if request.method == 'POST':
