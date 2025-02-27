@@ -282,3 +282,15 @@ footer {
 .button-neumorphic:focus {
   outline: none;
 }
+/* Estilo do ícone de gato */
+.cat-icon {
+  font-size: 12px; /* Tamanho pequeno */
+  margin-left: 5px; /* Espaçamento entre o texto e o ícone */
+  opacity: 0; /* Inicialmente invisível */
+  transition: opacity 0.3s ease; /* Animação suave */
+}
+
+/* Exibir o ícone de gato no hover */
+.video-button:hover .cat-icon {
+  opacity: 1; /* Torna o ícone visível */
+}
