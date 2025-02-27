@@ -1,7 +1,7 @@
 {% extends "livros/base.html" %}
-{% block title %}Registrar Devolução{% endblock %}
+{% block title %}Registrar Devolução: {{ loan.book_unit.book.title }} (Código: {{ loan.book_unit.code }}){% endblock %}
 {% block content %}
-<h2>Registrar Devolução: {{ loan.book.title }}</h2>
+<h2>Registrar Devolução: {{ loan.book_unit.book.title }} (Código: {{ loan.book_unit.code }})</h2>
 <form method="post" class="neumorphic p-4">
   {% csrf_token %}
   <div class="mb-3">

@@ -5,13 +5,12 @@
 
 <!-- Botão de Backup -->
 <a href="{% url 'backup' %}" class="btn btn-primary mb-3">Fazer Backup</a>
-
 <!-- Botão para acessar o Admin do Django -->
 <a href="/admin" class="btn btn-primary button-neumorphic">
   Acessar Admin Django
 </a>
-<!-- Listagem de Backups Disponíveis -->
 
+<!-- Listagem de Backups Disponíveis -->
 {% if backups %}
 <ul>
   {% for backup in backups %}
@@ -26,7 +25,7 @@
   {% endfor %}
 </ul>
 {% else %}
-
+<p>Nenhum backup disponível.</p>
 {% endif %}
 
 <!-- Formulário para Importar Backup -->
@@ -40,15 +39,15 @@
   <button type="submit" class="btn btn-success">Importar Backup</button>
 </form>
 
-<!-- Lista de Livros -->
-<h3>Livros</h3>
+<!-- Lista de Unidades de Livros -->
+<h3>Unidades de Livros</h3>
 <a href="{% url 'emprestimo' %}" class="btn btn-primary mb-3">Ir para Empréstimos</a>
 <table class="table table-bordered">
   <thead>
     <tr>
       <th>ID</th>
-      <th>Título</th>
-      <th>Autor</th>
+      <th>Título do Livro</th>
+      <th>Código da Unidade</th>
       <th>Status</th>
       <th>Tags</th>
       <th>Ações</th>
@@ -56,51 +55,53 @@
   </thead>
   <tbody>
     {% for book in books %}
-    <tr>
-      <td>{{ book.id }}</td>
-      <td>{{ book.title }}</td>
-      <td>{{ book.author }}</td>
-      <td>{{ book.available|yesno:"Disponível,Emprestado" }}</td>
-      <td>
-        {% for tag in book.tags.all %}
-          <span class="badge bg-secondary">{{ tag.name }}</span>
-        {% endfor %}
-      </td>
-      <td>
-        <a href="{% url 'edit_book' book.id %}" class="btn btn-sm btn-warning">Editar</a>
-      </td>
-    </tr>
+      {% for unit in book.units.all %}
+      <tr>
+        <td>{{ unit.id }}</td>
+        <td>{{ book.title }}</td>
+        <td>{{ unit.code }}</td>
+        <td>{{ unit.available|yesno:"Disponível,Emprestado" }}</td>
+        <td>
+          {% for tag in book.tags.all %}
+            <span class="badge bg-secondary">{{ tag.name }}</span>
+          {% endfor %}
+        </td>
+        <td>
+          <a href="{% url 'edit_book' book.id %}" class="btn btn-sm btn-warning">Editar Livro</a>
+        </td>
+      </tr>
+      {% endfor %}
     {% endfor %}
   </tbody>
 </table>
 
 <!-- Lista de Empréstimos -->
 <h3>Empréstimos</h3>
-{% if borrows %}
+{% if loans %}
 <table class="table table-bordered">
   <thead>
     <tr>
       <th>ID</th>
       <th>Livro</th>
-      <th>Usuário</th>
+      <th>Código da Unidade</th>
+      <th>Aluno</th>
       <th>Data de Empréstimo</th>
-      <th>Data Expiração</th>
       <th>Data de Devolução</th>
       <th>Ações</th>
     </tr>
   </thead>
   <tbody>
-    {% for borrow in borrows %}
+    {% for loan in loans %}
     <tr>
-      <td>{{ borrow.id }}</td>
-      <td>{{ borrow.book.title }}</td>
-      <td>{{ borrow.user.username }}</td>
-      <td>{{ borrow.borrowed_date|date:"Y-m-d H:i" }}</td>
-      <td>{{ borrow.expiration_date|date:"Y-m-d H:i" }}</td>
-      <td>{% if borrow.return_date %}{{ borrow.return_date|date:"Y-m-d H:i" }}{% else %}Pendente{% endif %}</td>
+      <td>{{ loan.id }}</td>
+      <td>{{ loan.book_unit.book.title }}</td>
+      <td>{{ loan.book_unit.code }}</td>
+      <td>{{ loan.student_name }} ({{ loan.student_id }})</td>
+      <td>{{ loan.borrowed_date|date:"Y-m-d H:i" }}</td>
+      <td>{% if loan.returned_date %}{{ loan.returned_date|date:"Y-m-d H:i" }}{% else %}Pendente{% endif %}</td>
       <td>
-        {% if not borrow.return_date %}
-          <a href="{% url 'return_book' borrow.id %}" class="btn btn-sm btn-success">Registrar Devolução</a>
+        {% if not loan.returned_date %}
+          <a href="{% url 'return_book' loan.id %}" class="btn btn-sm btn-success">Registrar Devolução</a>
         {% endif %}
       </td>
     </tr>

@@ -8,7 +8,8 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils import timezone
 from .models import Book, Tag, Loan
-from .forms import BookForm, LoanForm, ReturnForm, TagForm
+from .forms import BookForm, LoanForm, ReturnForm, TagForm, BookUnit
+from .forms import BorrowForm 
 
 logger = logging.getLogger(__name__)
 
@@ -19,16 +20,22 @@ def is_admin(user):
 def index(request):
     query = request.GET.get('search', '')
     tag_filter = request.GET.get('tag', '')
-    books = Book.objects.all()
-
+    
+    # Filtra unidades disponíveis com base no título do livro ou na tag
+    units = BookUnit.objects.filter(available=True)  # Apenas unidades disponíveis
     if query:
-        books = books.filter(title__icontains=query)
+        units = units.filter(book__title__icontains=query)  # Filtra pelo título do livro
     if tag_filter:
-        books = books.filter(tags__name=tag_filter)
-
-    tags = Tag.objects.all()
-    return render(request, 'livros/index.html', {'books': books, 'tags': tags, 'query': query, 'tag_filter': tag_filter})
-
+        units = units.filter(book__tags__name=tag_filter)  # Filtra pela tag do livro
+    
+    tags = Tag.objects.all()  # Recupera todas as tags
+    return render(request, 'livros/index.html', {
+        'units': units,  # Passa as unidades para o template
+        'tags': tags,
+        'query': query,
+        'tag_filter': tag_filter
+    })
+    
 def user_login(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -61,12 +68,15 @@ def add_book(request):
     if request.method == 'POST':
         form = BookForm(request.POST)
         if form.is_valid():
-            form.save()
+            form.save()  # Isso agora deve salvar também as tags corretamente
             messages.success(request, 'Livro adicionado com sucesso!')
             return redirect('admin_panel')
+        else:
+            print("❌ Erros no formulário:", form.errors)  # Depuração
     else:
         form = BookForm()
     return render(request, 'livros/add_book.html', {'form': form})
+
 
 @login_required
 @user_passes_test(is_admin)
@@ -83,58 +93,54 @@ def edit_book(request, book_id):
     return render(request, 'livros/edit_book.html', {'form': form, 'book': book})
 
 @login_required
-def borrow_book(request, book_id):
-    book = get_object_or_404(Book, pk=book_id)
+
+def borrow_book(request, pk):
+    unit = get_object_or_404(BookUnit, id=pk, available=True)  # Verifica se a unidade está disponível
     
-    if book.available_quantity > 0:
-        if request.method == 'POST':
-            form = LoanForm(request.POST)
-            if form.is_valid():
-                loan = form.save(commit=False)
-                loan.book = book
-                loan.save()
-
-                # Atualiza a quantidade disponível do livro
-                book.available_quantity -= 1
-                book.save()
-
-                messages.success(request, 'Livro emprestado com sucesso!')
-                return redirect('index')
+    if request.method == 'POST':
+        form = BorrowForm(request.POST)
+        if form.is_valid():
+            # Cria um novo empréstimo
+            Loan.objects.create(
+                book_unit=unit,
+                student_name=form.cleaned_data['student_name'],
+                student_id=form.cleaned_data['student_id']
+            )
+            # Atualiza o status da unidade para indisponível
+            unit.available = False
+            unit.save()
+            messages.success(request, "Empréstimo confirmado com sucesso!")
+            return redirect('index')  # Redireciona para a página inicial
         else:
-            form = LoanForm()
-        return render(request, 'livros/borrow.html', {'form': form, 'book': book})
+            messages.error(request, "Erro ao processar o formulário. Por favor, verifique os campos.")
     else:
-        messages.error(request, 'Este livro não está disponível para empréstimo.')
-        return redirect('index')
-
+        form = BorrowForm()  # Cria uma instância vazia do formulário
+    
+    return render(request, 'livros/borrow.html', {'form': form, 'unit': unit})
 @login_required
 @user_passes_test(is_admin)
 def return_book(request, loan_id):
-    loan = get_object_or_404(Loan, pk=loan_id)
-
+    loan = get_object_or_404(Loan, pk=loan_id, returned_date__isnull=True)
     if request.method == 'POST':
         form = ReturnForm(request.POST, instance=loan)
         if form.is_valid():
             # Salva a data de devolução
-            loan = form.save(commit=False)
-            loan.returned_date = form.cleaned_data['return_date'].date()  # Define a data de devolução
+            loan.returned_date = timezone.now().date()
             loan.save()
-
-            # Atualiza a quantidade disponível do livro
-            loan.book.available_quantity += 1
-            loan.book.save()
-
-            # Exibe mensagem de sucesso
-            messages.success(request, 'Livro marcado como devolvido.')
-            return redirect('list_loans')  # Redireciona para a lista de empréstimos
+            # Atualiza o status da unidade
+            loan.book_unit.available = True
+            loan.book_unit.save()
+            messages.success(request, f'Unidade "{loan.book_unit.code}" do livro "{loan.book_unit.book.title}" devolvida com sucesso!')
+            return redirect('list_loans')
     else:
         form = ReturnForm(instance=loan)
-
     return render(request, 'livros/return_book.html', {'form': form, 'loan': loan})
+
+
 @login_required
 @user_passes_test(is_admin)
 def list_loans(request):
-    loans = Loan.objects.filter(returned_date__isnull=True)
+    loans = Loan.objects.filter(returned_date__isnull=True).select_related('book_unit', 'book_unit__book')
     return render(request, 'livros/list_loans.html', {'loans': loans})
 
 @login_required
@@ -151,8 +157,30 @@ def manage_tags(request):
     tags = Tag.objects.all()
     return render(request, 'livros/manage_tags.html', {'form': form, 'tags': tags})
 
+
+
 @login_required
 @user_passes_test(is_admin)
+def delete_tag(request, tag_id):
+    tag = get_object_or_404(Tag, pk=tag_id)
+    if request.method == 'POST':
+        tag.delete()
+        messages.success(request, f'Tag "{tag.name}" excluída com sucesso!')
+        return redirect('manage_tags')
+    return render(request, 'livros/delete_tag_confirm.html', {'tag': tag})
+
+@login_required
+def emprestimo_view(request):
+    query = request.GET.get('q', '')
+    units = BookUnit.objects.filter(available=True)  # Filtra unidades disponíveis
+    
+    if query:
+        units = units.filter(book__title__icontains=query)
+    
+    return render(request, 'livros/emprestimo.html', {'units': units, 'query': query})
+
+
+@login_required
 def backup(request):
     backup_dir = os.path.join(settings.BASE_DIR, 'backup')
     if not os.path.exists(backup_dir):
@@ -168,28 +196,9 @@ def backup(request):
         messages.error(request, f'Erro ao fazer backup: {str(e)}')
     return redirect('admin_panel')
 
-@login_required
-@user_passes_test(is_admin)
-def delete_tag(request, tag_id):
-    tag = get_object_or_404(Tag, pk=tag_id)
-    if request.method == 'POST':
-        tag.delete()
-        messages.success(request, f'Tag "{tag.name}" excluída com sucesso!')
-        return redirect('manage_tags')
-    return render(request, 'livros/delete_tag_confirm.html', {'tag': tag})
+
 
 @login_required
-def emprestimo_view(request):
-    query = request.GET.get('q', '')
-    books = Book.objects.filter(available_quantity__gt=0)  # Filtra livros disponíveis
-    
-    if query:
-        books = books.filter(title__icontains=query)
-    
-    return render(request, 'livros/emprestimo.html', {'books': books, 'query': query})
-
-@login_required
-@user_passes_test(is_admin)
 def backup_list(request):
     backup_dir = os.path.join(settings.BASE_DIR, 'backup')
     if not os.path.exists(backup_dir):
@@ -200,7 +209,6 @@ def backup_list(request):
 
 
 @login_required
-@user_passes_test(is_admin)
 def import_backup(request):
     backup_dir = os.path.join(settings.BASE_DIR, 'backup')
     db_path = settings.DATABASES['default']['NAME']

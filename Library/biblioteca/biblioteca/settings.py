@@ -30,7 +30,8 @@ DEBUG = True
 #tirar depois
 ALLOWED_HOSTS = ['*',]
 
-
+LOGIN_URL = '/login/'  # URL para redirecionar se não estiver autenticado
+#LOGIN_REDIRECT_URL = '/admin_panel/' 
 #tirar depois
 CSRF_TRUSTED_ORIGINS = [
     "https://b243-200-148-4-32.ngrok-free.app",
@@ -58,6 +59,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'biblioteca.urls'

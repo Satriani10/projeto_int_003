@@ -1,10 +1,47 @@
 {% extends "livros/base.html" %}
 {% block title %}Adicionar Livro{% endblock %}
 {% block content %}
-<h2>Adicionar Livro</h2>
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit" class="btn btn-primary">Adicionar Livro</button>
-</form>
+<div class="container">
+  <h2 class="text-center">Adicionar Livro</h2>
+  <form method="post" class="mt-4">
+    {% csrf_token %}
+    
+    <!-- Título -->
+    <div class="form-group">
+      <label for="title">Título:</label>
+      <input type="text" name="title" id="title" class="form-control" value="{{ form.title.value|default_if_none:'' }}" required>
+    </div>
+    
+    <!-- Autor -->
+    <div class="form-group">
+      <label for="author">Autor:</label>
+      <input type="text" name="author" id="author" class="form-control" value="{{ form.author.value|default_if_none:'' }}" required>
+    </div>
+    
+    <!-- Tags -->
+    <div class="form-group">
+      <label for="tags">Tags:</label>
+      <input type="text" name="tags" id="tags" class="form-control" value="{{ form.tags.value|default_if_none:'' }}">
+      <small class="form-text text-muted">Informe as tags separadas por vírgula (ex.: Ficção, Aventura).</small>
+    </div>
+    
+    <!-- Quantidade de Cópias -->
+    <div class="form-group">
+      <label for="quantity">Quantidade de Cópias:</label>
+      <input type="number" name="quantity" id="quantity" class="form-control" value="{{ form.quantity.value|default_if_none:'' }}" required min="1">
+    </div>
+    
+    <!-- Códigos -->
+    <div class="form-group">
+      <label for="unit_codes">Códigos das Unidades:</label>
+      <input type="text" name="unit_codes" id="unit_codes" class="form-control" value="{{ form.unit_codes.value|default_if_none:'' }}">
+      <small class="form-text text-muted">Informe os códigos das unidades separadas por vírgula (ex.: 12345, 67890, 54321).</small>
+    </div>
+    
+    <!-- Botão de Envio -->
+    <div class="text-center">
+      <button type="submit" class="btn btn-primary">Adicionar Livro</button>
+    </div>
+  </form>
+</div>
 {% endblock %}

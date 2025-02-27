@@ -1,7 +1,7 @@
 {% extends "livros/base.html" %}
-{% block title %}Emprestar Livro{% endblock %}
+{% block title %}Emprestar Unidade: {{ unit.book.title }} (Código: {{ unit.code }}){% endblock %}
 {% block content %}
-<h2 class="mb-4">Emprestar Livro: {{ book.title }}</h2>
+<h2 class="mb-4">Emprestar Unidade: {{ unit.book.title }} (Código: {{ unit.code }})</h2>
 <form method="post" class="neumorphic p-4">
   {% csrf_token %}
   <div class="mb-3">

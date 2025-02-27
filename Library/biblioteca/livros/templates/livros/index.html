@@ -2,54 +2,59 @@
 {% block title %}Biblioteca - Home{% endblock %}
 {% block content %}
 <h1>Catálogo de Livros</h1>
+
 <!-- Barra de Pesquisa -->
 <form method="get">
   <input type="text" name="search" placeholder="Buscar..." value="{{ query }}">
   <button type="submit" class="button-neumorphic">Buscar</button>
 </form>
+
 <!-- Filtro por Tags -->
-Filtrar por tag:
+<p>Filtrar por tag:</p>
 {% for tag in tags %}
   <a href="?tag={{ tag.name }}" class="tag-link">{{ tag.name }}</a>
 {% endfor %}
-<!-- Lista de Livros -->
+
+<!-- Lista de Unidades Disponíveis -->
 <table class="table table-bordered">
   <thead>
     <tr>
-      <th>Título</th>
-      <th>Autor</th>
+      <th>Título do Livro</th>
+      <th>Código da Unidade</th>
       <th>Tags</th>
       <th>Status</th>
-      <th>Quantidade Disponível</th>
       <th>Ações</th>
     </tr>
   </thead>
   <tbody>
-    {% for book in books %}
+    {% for unit in units %}
     <tr>
-      <td>{{ book.title }}</td>
-      <td>{{ book.author }}</td>
+      <td>{{ unit.book.title }}</td>
+      <td>{{ unit.code }}</td>
       <td>
-        {% for tag in book.tags.all %}
+        {% for tag in unit.book.tags.all %}
           <span class="badge">{{ tag.name }}</span>
         {% endfor %}
       </td>
       <td>
-        {% if book.available_quantity > 0 %}
+        {% if unit.available %}
           Disponível
         {% else %}
-          Indisponível
+          Emprestado
         {% endif %}
       </td>
-      <td>{{ book.available_quantity }}</td>
       <td>
-        {% if user.is_staff and book.available_quantity > 0 %}
-          <a href="{% url 'borrow_book' book.id %}" class="btn btn-primary">Emprestar</a>
+        {% if user.is_staff and unit.available %}
+          <a href="{% url 'borrow_book' unit.id %}" class="btn btn-primary">Emprestar</a>
         {% endif %}
         {% if user.is_staff %}
-          <a href="{% url 'edit_book' book.id %}" class="btn btn-warning">Editar</a>
+          <a href="{% url 'edit_book' unit.book.id %}" class="btn btn-warning">Editar Livro</a>
         {% endif %}
       </td>
+    </tr>
+    {% empty %}
+    <tr>
+      <td colspan="5" class="text-center">Nenhuma unidade disponível.</td>
     </tr>
     {% endfor %}
   </tbody>
