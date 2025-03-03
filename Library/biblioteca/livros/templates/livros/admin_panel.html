@@ -3,42 +3,44 @@
 {% block content %}
 <h2>Painel Administrativo</h2>
 
-<!-- Botão de Backup -->
-<a href="{% url 'backup' %}" class="btn btn-primary mb-3">Fazer Backup</a>
-<a href="/admin" class="btn btn-primary button-neumorphic">Acessar Admin Django</a>
+<!-- Botões Alinhados -->
+<div class="d-flex gap-3 mb-3">
+  <a href="{% url 'backup' %}" class="btn btn-primary button-neumorphic">Fazer Backup</a>
+  <a href="/admin" class="btn btn-primary button-neumorphic">Acessar Admin Django</a>
+  <a href="{% url 'emprestimo' %}" class="btn btn-primary button-neumorphic">Ir para Empréstimos</a>
+</div>
 
 <!-- Listagem de Backups Disponíveis -->
 {% if backups %}
-<ul>
+<ul class="list-unstyled">
   {% for backup in backups %}
-  <li>
-    {{ backup }}
+  <li class="d-flex align-items-center gap-2 mb-2">
+    <span>{{ backup }}</span>
     <form method="post" action="{% url 'import_backup' %}" style="display:inline;">
       {% csrf_token %}
       <input type="hidden" name="selected_backup" value="{{ backup }}">
-      <button type="submit" name="confirm_import" class="btn btn-sm btn-success">Importar</button>
+      <button type="submit" name="confirm_import" class="btn btn-sm btn-success button-neumorphic">Importar</button>
     </form>
   </li>
   {% endfor %}
 </ul>
 {% else %}
-<p>Nenhum backup disponível.</p>
+
 {% endif %}
 
 <!-- Formulário para Importar Backup -->
 <h3>Importar Backup</h3>
-<form method="post" action="{% url 'import_backup' %}" enctype="multipart/form-data">
+<form method="post" action="{% url 'import_backup' %}" enctype="multipart/form-data" class="mb-4">
   {% csrf_token %}
   <div class="mb-3">
     <label for="backup_file" class="form-label">Selecione o arquivo de backup (.db):</label>
     <input type="file" class="form-control" id="backup_file" name="backup_file" accept=".db" required>
   </div>
-  <button type="submit" class="btn btn-success">Importar Backup</button>
+  <button type="submit" class="btn btn-success button-neumorphic">Importar Backup</button>
 </form>
 
 <!-- Lista de Unidades de Livros -->
 <h3>Unidades de Livros</h3>
-<a href="{% url 'emprestimo' %}" class="btn btn-primary mb-3">Ir para Empréstimos</a>
 <table class="table table-bordered">
   <thead>
     <tr>
@@ -61,7 +63,7 @@
           {% endfor %}
         </td>
         <td>
-          <a href="{% url 'edit_book' book.id %}" class="btn btn-sm btn-warning">Editar Livro</a>
+          <a href="{% url 'edit_book' book.id %}" class="btn btn-sm btn-warning button-neumorphic">Editar Livro</a>
         </td>
       </tr>
     {% endfor %}
@@ -94,7 +96,7 @@
       <td>{% if loan.returned_date %}{{ loan.returned_date|date:"Y-m-d H:i" }}{% else %}Pendente{% endif %}</td>
       <td>
         {% if not loan.returned_date %}
-          <a href="{% url 'return_book' loan.id %}" class="btn btn-sm btn-success">Registrar Devolução</a>
+          <a href="{% url 'return_book' loan.id %}" class="btn btn-sm btn-success button-neumorphic">Registrar Devolução</a>
         {% endif %}
       </td>
     </tr>
