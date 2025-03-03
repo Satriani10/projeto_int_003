@@ -17,5 +17,6 @@ urlpatterns = [
     path('import_backup/', views.import_backup, name='import_backup'),
     path('backup_list/', views.backup_list, name='backup_list'),
     path('loans/', views.list_loans, name='list_loans'),
+    path('api/assistant/response/', views.get_assistant_response, name='assistant_response'),
     # path('available_units/', views.available_units, name='available_units'),  # Nova rota (opcional)
 ]

@@ -12,12 +12,14 @@
 
 <!-- Lista de tags existentes -->
 <h3>Tags Existentes</h3>
-<ul>
+<ul class="list-unstyled">
   {% for tag in tags %}
-    <li>
-      {{ tag.name }}
-      <!-- Botão para excluir a tag -->
-      <a href="{% url 'delete_tag' tag.id %}" class="btn btn-danger btn-sm">Excluir</a>
+    <li class="d-flex align-items-center mb-2">
+      <span class="me-3">{{ tag.name }}</span>
+      <!-- Botão para excluir a tag com ícone de lixeira -->
+      <a href="{% url 'delete_tag' tag.id %}" class="btn btn-danger btn-sm p-1" style="line-height: 1;">
+        <i class="fas fa-trash-alt"></i> <!-- Ícone de lixeira do Font Awesome -->
+      </a>
     </li>
   {% empty %}
     <li>Nenhuma tag cadastrada.</li>

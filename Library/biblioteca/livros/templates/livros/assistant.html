@@ -1,0 +1,19 @@
+{% load static %}
+
+<div id="assistant-container" class="assistant-container">
+    <div id="assistant-icon" class="assistant-icon draggable">
+        <img src="{% static 'livros/img/assistant_icon.png' %}" alt="Assistente Virtual">
+    </div>
+    <div id="assistant-box" class="assistant-box hidden">
+        <div class="assistant-header">
+            Perguntas Frequentes
+        </div>
+        <div class="assistant-content">
+            <ul id="faq-list"></ul>
+        </div>
+        <div id="response-box" class="response-box hidden">
+            <div id="response-text" class="response-text"></div>
+            <button id="close-response" class="close-response">Fechar</button>
+        </div>
+    </div>
+</div>

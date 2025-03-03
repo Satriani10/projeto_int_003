@@ -12,7 +12,11 @@ from .forms import BookForm, LoanForm, ReturnForm, TagForm, BookUnit
 from .forms import BorrowForm 
 from django.core.paginator import Paginator
 from django.db.models import Count, Q
+from django.http import JsonResponse
+import json
+
 logger = logging.getLogger(__name__)
+
 
 # Função para verificar se o usuário é administrador
 def is_admin(user):
@@ -279,3 +283,50 @@ def import_backup(request):
             return redirect('admin_panel')
 
     return redirect('admin_panel')
+
+# Adicione esta função ao arquivo views.py
+
+from django.http import JsonResponse
+
+def get_assistant_response(request):
+   
+    if request.method == 'POST':
+        import json
+        data = json.loads(request.body)
+        question = data.get('question', '').lower().strip()
+        
+        # Base de conhecimento
+        knowledge_base = {
+            "como faço para emprestar um livro": "Para emprestar um livro, navegue até a página do livro desejado, clique no botão 'Emprestar' e confirme a operação. O prazo padrão é de 14 dias.",
+            "como renovar um empréstimo": "Para renovar um empréstimo, acesse a seção 'Livros Emprestados' e clique no botão 'Renovar' ao lado do livro que deseja renovar. Só é possível renovar se não houver reservas para o livro.",
+            "onde vejo meus livros emprestados": "Seus livros emprestados podem ser visualizados na seção 'Livros Emprestados', acessível no menu superior (para administradores).",
+            "como faço login no sistema": "Para fazer login, clique no botão 'Login' no canto superior direito e insira seu nome de usuário e senha.",
+            "como fazer logout": "Para sair do sistema, clique no link 'Logout' no menu superior direito.",
+            "como adicionar um livro": "Para adicionar um novo livro, você precisa ser administrador. Clique em 'Adicionar Livro' no menu superior e preencha o formulário com os detalhes do livro.",
+            "como gerenciar tags": "Para gerenciar as tags (categorias) dos livros, você deve ser administrador. Acesse 'Gerenciar Tags' no menu superior para adicionar, editar ou remover tags.",
+            "como fazer backup": "Para fazer backup do sistema, você deve ser administrador. Acesse 'Backup' no menu superior para iniciar o processo.",
+            "para que serve o botão de vídeo": "O botão de vídeo com ícone de gato leva a um vídeo no YouTube que pode conter informações adicionais ou tutoriais sobre o sistema.",
+            "o que posso fazer como administrador": "Como administrador, você pode adicionar livros, gerenciar tags, fazer backup do sistema, ver todos os livros emprestados e acessar o painel administrativo.",
+            "como pesquisar livros": "Você pode pesquisar livros usando a barra de busca na página principal, filtrando por título, autor ou tags."
+        }
+        
+        # Verificar correspondência exata
+        if question in knowledge_base:
+            return JsonResponse({"response": knowledge_base[question]})
+        
+        # Verificar palavras-chave
+        for key in knowledge_base:
+            # Dividir em palavras-chave para busca mais flexível
+            key_words = key.split(' ')
+            match_count = sum(1 for word in key_words if len(word) > 3 and word in question)
+            
+            # Se encontrou pelo menos 2 palavras-chave ou 50% das palavras
+            if match_count >= 2 or match_count >= len(key_words) * 0.5:
+                return JsonResponse({"response": knowledge_base[key]})
+        
+        # Resposta padrão se não encontrar correspondência
+        return JsonResponse({
+            "response": "Desculpe, não tenho informações sobre isso. Por favor, tente reformular sua pergunta ou entre em contato com a administração da biblioteca para assistência."
+        })
+    
+    return JsonResponse({"error": "Método inválido. Use POST."})

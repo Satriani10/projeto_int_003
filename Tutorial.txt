@@ -1,0 +1,52 @@
+Primeiro de tudo, certifique-se que as pastas "instalação" e "iniciar" estão presentes, se não estiverem, contate o administrador!
+
+
+Funções:
+
+1- Alguns antivírus dão um falso positivo durante a instalação, mas não se preocupe, o software não contém nenhum tipo de script malicioso, ele apenas baixa os programas necessários para o funcionamento.
+
+2- Aperte em instalação para que as bibliotecas necessárias do programa possam funcionar.
+
+3- Ao apertar "iniciar" uma aba irá aparecer, aguarde até abrir o navegador e NÃO feche a aba, ela que mantém o servidor.
+
+Dúvidas e respostas:
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SOBRE LOGIN:
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Q: Como faço para acessar as funcionalidades?
+R: Para acessar o banco de dados e demais funcionalidades do sistema, faça login.
+
+Q: Não consigo logar!
+R: Por enquanto não há funcionalidades de registro de usuários, a senha e o usuário administrativo são feitas diretamente no código, contate o administrador para recebe-las, (Para fins acadêmicos, não colocarei a senha diretamente neste .txt)
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SOBRE FUNCIONALIDADES:
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Q: Preciso salvar algo antes de fechar a aba que irá abrir ao iniciar o programa?
+R: Não, os dados ficam salvo independente de fazer o backup, mas é de suma importância gerir os backups com regularidade para a segurança das informações serem preservadas. 
+
+Q: O programa travou, o que faço?
+R: Se algo der errado, reinicie o programa, se o problema persistir, favor contate o administrador!
+
+Q:Como faço para gerir ou adicionar um grande volume de dados?
+R: Na aba "painel administrativo" aperte em "admin django", vá até "Books" e aperte em "adicionar", lá terá uma janela onde poderá colocar os dados, salva-los e prosseguir com mais informações.
+
+Q: Preciso deletar um livro, como faço?
+R: Na aba de "admin django", você pode selecionar/pesquisar o erro e apertar nele, assim escolhendo a opção "excluir".
+
+Q: É obrigatório inserir todos os dados cadastrais que forem pedidos?
+R: Sim, mediante a fase teste, todos os campos digitáveis devem ter informações, ou não será possível salva-los.
+
+Q: Existe algum tipo de confirmação de alterações?
+R: Sim e não, existem avisos a respeito de mudanças feitas, como excluir tags, livros e na aba de empréstimos, mas algumas coisas não possuem confirmação dupla para realiza-las.
+
+Q: Errei na hora de devolver um empréstimo, o que faço?
+R: No momento o programa não tem sistema de volta de função (a ser adicionado), o que pode fazer é: retornar um backup
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SOBRE BACKUP:
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Q: Como faço para realizar um backup?
+R: Na Aba "Backup" encontrada em cima, basta apertar o botão escrito "backup" e irá gerar um arquivo ".db" com seu respectivo nome.
+
+Q: Como faço para importar um backup?
+R: Na pasta do programa, "Library/biblioteca" existe uma pasta chamada "backup", lá estão os arquivos ".db" mencionados, basta escolher o que tem a data de sua preferencia e seleciona-la, feito isso, basta apertar o botão "importar" e pronto!
+
